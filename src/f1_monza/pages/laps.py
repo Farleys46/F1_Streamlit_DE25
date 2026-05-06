@@ -22,12 +22,44 @@ def format_laptime(seconds: float) -> str:
     secs = seconds % 60
     return f"{mins}:{secs:06.3f}"
 
+def clean_laps(laps_df: pd.DataFrame) -> pd.DataFrame:
+    return laps_df[
+        (laps_df["is_pit_out_lap"] == False) &
+        (laps_df["lap_duration"].notna()) &
+        (laps_df["lap_duration"] > 60)
+    ].copy()
+
 @st.cache_data
 def load_data():
     laps = pd.read_csv(DATA_DIR / "laps_clean_updated.csv")
     positions = pd.read_csv(DATA_DIR / "final_positions.csv")
-    return laps, positions
+    weather = pd.read_csv(DATA_DIR / "all_weather_data.csv")
+    return laps, positions, weather
 
+# Kpi:s
+def show_kpis(laps_df, weather_df, positions_df, year, session_type):
+    pos_filterd =positions_df[
+        (positions_df["year"] == year) & 
+        (positions_df["session_type"] == session_type)
+    ]
+    session_key = pos_filterd["session_key"].unique()
+
+    laps_session = laps_df[laps_df["session_key"].isin(session_key)]
+    weather_session = weather_df[weather_df["session_key"].isin(session_key)]
+
+    total_laps = laps_session["lap_number"].max()
+    avg_track_temp = weather_session["track_temperature"].mean()
+    top_speed = laps_session["st_speed"].max()
+
+    avg_lap = clean_laps(laps_session)["lap_duration"].mean()
+
+    col_laps, col_temp, col_speed, col_avg_lap = st.columns(4)
+    col_laps.metric("Laps", f"{int(total_laps)}")
+    col_temp.metric("Avg Track Temp", f"{avg_track_temp:.2f} °C")
+    col_speed.metric("Top Speed", f"{int(top_speed)} Km/h")
+    col_avg_lap.metric("Avg Lap Time", format_laptime(float(avg_lap)))
+
+### Barchart ###
 def build_gap_chart(
         laps_df: pd.DataFrame,
         positions_df: pd.DataFrame,
@@ -44,15 +76,10 @@ def build_gap_chart(
     if pos_filtered.empty:
         return None
     
-
-    clean_laps = laps_df[
-        (laps_df["is_pit_out_lap"] == False) &
-        (laps_df["lap_duration"].notna()) &
-        (laps_df["lap_duration"] > 60)
-    ].copy()
+    filtered_laps = clean_laps(laps_df)
 
     session_keys = pos_filtered["session_key"].unique()
-    laps_session = clean_laps[clean_laps["session_key"].isin(session_keys)]
+    laps_session = filtered_laps[filtered_laps["session_key"].isin(session_keys)]
 
     sector_col_map = {
         "Full lap": "lap_duration",
@@ -136,10 +163,9 @@ def build_gap_chart(
     return fig
 
 def show():
-    laps_df, positions_df = load_data()
-
-    st.markdown("### Lap Time Gap")
-
+    laps_df, positions_df, weather_df = load_data()
+    
+    # Slicers
     col_year, col_session, col_sector = st.columns(3)
 
     with col_year:
@@ -158,6 +184,8 @@ def show():
             options=["Full lap", "Sector 1", "Sector 2", "Sector 3"],
             index=0,
         )
+
+    show_kpis(laps_df, weather_df, positions_df, year, session_type)
 
     fig = build_gap_chart(laps_df, positions_df, year, session_type, sector)
 
