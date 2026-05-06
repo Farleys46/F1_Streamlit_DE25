@@ -1,0 +1,146 @@
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+from pathlib import Path
+
+DATA_DIR = Path(__file__).parent.parent / "assets" / "data"
+
+DRIVER_ABBR = {
+    1: "VER", 4: "NOR", 81: "PIA", 16: "LEC", 63: "RUS",
+    44: "HAM", 55: "SAI", 14: "ALO", 11: "PER", 23: "ALB",
+    22: "TSU", 3: "RIC", 2: "SAR", 20: "MAG", 31: "OCO",
+    10: "GAS", 18: "STR", 27: "HUL", 77: "BOT", 24: "ZHO",
+    40: "LAW", 43: "COL", 30: "HAD", 6: "HAD", 12: "ANT",
+    5: "BEA", 87: "BOR",
+}
+
+def format_gap(seconds: float) -> str:
+    return f"+{seconds:.3f}"
+
+def format_laptime(seconds: float) -> str:
+    mins = int(seconds //60)
+    secs = seconds % 60
+    return f"{mins}:{secs:06.3f}"
+
+@st.cache_data
+def load_data():
+    laps = pd.read_csv(DATA_DIR / "laps_clean_updated.csv")
+    positions = pd.read_csv(DATA_DIR / "final_positions.csv")
+    return laps, positions
+
+def build_gap_chart(
+        laps_df: pd.DataFrame,
+        positions_df: pd.DataFrame,
+        year: int,
+        session_type: str,
+) -> go.Figure:
+    
+    pos_filtered = positions_df[
+        (positions_df["year"] == year) &
+        (positions_df["session_type"] == session_type)
+    ].copy()
+
+    if pos_filtered.empty:
+        return None
+    
+
+    clean_laps = laps_df[
+        (laps_df["is_pit_out_lap"] == False) &
+        (laps_df["lap_duration"].notna()) &
+        (laps_df["lap_duration"] > 60)
+    ].copy()
+
+    session_keys = pos_filtered["session_key"].unique()
+    laps_session = clean_laps[clean_laps["session_key"].isin(session_keys)]
+
+    best_laps = (
+        laps_session
+        .groupby("driver_number")["lap_duration"]
+        .min()
+        .reset_index()
+        .rename(columns={"lap_duration": "best_lap"})
+    )
+
+    merged = pos_filtered.merge(best_laps, on="driver_number", how="left")
+    merged = merged.dropna(subset=["best_lap"])
+    merged = merged.sort_values("position")
+
+    if merged.empty:
+        return None
+    
+    fastest = merged["best_lap"].min()
+    merged["gap"] = merged["best_lap"] - fastest
+    merged["abbr"] = merged["driver_number"].map(DRIVER_ABBR).fillna(
+        merged["driver_number"].astype(str)
+    )
+
+    merged["y_label"] = merged.apply(
+        lambda r: f"P{str(r['position']).zfill(2)}. {r['abbr']}", axis=1
+    )
+
+    text_labels = []
+    for _, row in merged.iterrows():
+        if row["gap"] == 0:
+            text_labels.append(format_laptime(row["best_lap"]))
+        else:
+            text_labels.append(format_gap(row["gap"]))
+    
+    fig =go.Figure()
+    fig.add_trace(go.Bar(
+        x=merged["gap"],
+        y=merged["y_label"],
+        orientation="h",
+        text=text_labels,
+        textposition="outside",
+        textfont=dict(color="white", size=12, family="monospace"),
+        marker=dict(color="white"),
+        hovertemplate=(
+            "<b>%{y}</b><br>"
+            "Best lap-time: %{customdata}<br>"
+            "Gap: %{text}<extra></extra>"
+        ),
+        customdata=[format_laptime(v) for v in merged["best_lap"]],
+    ))
+
+    fig.update_layout(
+        plot_bgcolor="#0a0a0a",
+        paper_bgcolor="#0a0a0a",
+        font=dict(color="white", family="monospace"),
+        xaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            tickfont=dict(color="#888888", size=11),
+            range=[0, merged["gap"].max() * 1.35],
+        ),
+        yaxis=dict(
+            autorange="reversed",
+            tickfont=dict(color="white", size=12),
+            showgrid=False,
+        ),
+        margin=dict(l=10, r=80, t=10, b=30),
+        height=580,
+        bargap=0.35,
+        showlegend=False,
+    )
+
+    return fig
+
+def show():
+    laps_df, positions_df = load_data()
+
+    st.markdown("### Lap Time Gap")
+
+    year = 2025
+    session_type = "Qualifying"
+
+    fig = build_gap_chart(laps_df, positions_df, year, session_type)
+
+    if fig is None:
+        st.warning(f"No data found for {year}- {session_type}.")
+        return
+
+    st.plotly_chart(fig, use_container_width=True)
+
+if __name__ == "__main__":
+    st.set_page_config(layout="wide", page_title="Laps – Monza")
+    show()
