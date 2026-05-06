@@ -1,42 +1,69 @@
 import streamlit as st
 
+from f1_monza.utils.constants import STYLE_PATH
 from f1_monza.utils.helpers import (
     get_drivers_df,
     get_laps_df,
-    get_pit_df,
+    get_pits_df,
     get_positions_df,
     get_sessions_df,
     get_stints_df,
     get_weather_df,
+    read_css,
 )
 
 
 def raw_data():
-    st.title("Raw Data")
-    st.caption(
-        "All tables fetched from the OpenF1 API and exported to CSV. "
-        "Use the tabs below to inspect each dataset."
+    read_css(STYLE_PATH / "dark.css")
+
+    st.markdown(
+        '<div class="tm-section-label">DATA EXPLORER</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown("# Raw Data")
+    st.markdown(
+        "Every dataset that powers this dashboard. Click a tab to explore. "
+        "Sorted, filtered, and downloadable from the toolbar."
     )
 
     tabs = st.tabs(
-        ["Stints", "Pit stops", "Drivers", "Laps", "Positions", "Weather", "Sessions"]
+        ["STINTS", "PIT STOPS", "DRIVERS", "LAPS", "POSITIONS", "WEATHER", "SESSIONS"]
     )
 
     with tabs[0]:
-        st.dataframe(get_stints_df(), width="stretch")
+        df = get_stints_df()
+        st.caption(f"{len(df):,} rows · stints.csv")
+        st.dataframe(df, use_container_width=True, height=600)
+
     with tabs[1]:
-        st.dataframe(get_pit_df(), width="stretch")
+        df = get_pits_df()
+        st.caption(f"{len(df):,} rows · pit_with_compound.csv")
+        st.dataframe(df, use_container_width=True, height=600)
+
     with tabs[2]:
-        st.dataframe(get_drivers_df(), width="stretch")
+        df = get_drivers_df()
+        st.caption(f"{len(df):,} rows · drivers_clean_updated.csv")
+        st.dataframe(df, use_container_width=True, height=600)
+
     with tabs[3]:
-        st.dataframe(get_laps_df(), width="stretch")
+        df = get_laps_df()
+        st.caption(f"{len(df):,} rows · laps_clean_updated.csv")
+        st.dataframe(df, use_container_width=True, height=600)
+
     with tabs[4]:
-        st.dataframe(get_positions_df(), width="stretch")
+        df = get_positions_df()
+        st.caption(f"{len(df):,} rows · final_positions.csv")
+        st.dataframe(df, use_container_width=True, height=600)
+
     with tabs[5]:
-        st.dataframe(get_weather_df(), width="stretch")
+        df = get_weather_df()
+        st.caption(f"{len(df):,} rows · all_weather_data.csv")
+        st.dataframe(df, use_container_width=True, height=600)
+
     with tabs[6]:
-        st.dataframe(get_sessions_df(), width="stretch")
+        df = get_sessions_df()
+        st.caption(f"{len(df):,} rows · sessions_data.csv")
+        st.dataframe(df, use_container_width=True, height=600)
 
 
-if __name__ == "__main__":
-    raw_data()
+raw_data()

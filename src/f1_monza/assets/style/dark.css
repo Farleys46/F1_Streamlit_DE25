@@ -1,0 +1,229 @@
+/* =========================================================================
+   F1 MONZA · DARK TRACKMETRICS THEME
+   ========================================================================= */
+
+:root {
+  --bg: #0a0a0a;
+  --panel: #111111;
+  --border: #1f1f1f;
+  --text: #ffffff;
+  --text-dim: #8a8a8a;
+  --text-faint: #555555;
+  --accent: #e10600; /* F1 red */
+  --accent-yellow: #ffd800; /* medium tyre */
+  --mclaren: #ff8000;
+}
+
+/* --- Global base --------------------------------------------------------- */
+.stApp {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Helvetica Neue", "Inter", sans-serif;
+}
+
+[data-testid="stHeader"] {
+  background-color: transparent;
+}
+[data-testid="stToolbar"] {
+  display: none;
+}
+
+/* --- Sidebar ------------------------------------------------------------- */
+[data-testid="stSidebar"] {
+  background-color: #050505;
+  border-right: 1px solid var(--border);
+}
+[data-testid="stSidebar"] * {
+  color: var(--text) !important;
+}
+
+/* --- Typography ---------------------------------------------------------- */
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Helvetica Neue", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+h1 {
+  font-size: 3rem;
+  text-transform: uppercase;
+}
+h2 {
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --- Panels / cards ------------------------------------------------------ */
+.tm-panel {
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* --- Header strip -------------------------------------------------------- */
+.tm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0 1.5rem 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+.tm-header-left {
+  font-family: "Courier New", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.tm-header-center {
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.tm-header-right svg {
+  height: 60px;
+  width: auto;
+}
+
+/* --- KPI block ----------------------------------------------------------- */
+.tm-kpi-value {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--text);
+}
+.tm-kpi-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-top: 0.4rem;
+}
+
+/* --- Streamlit metric override ------------------------------------------ */
+[data-testid="stMetric"] {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+[data-testid="stMetricValue"] {
+  font-size: 2.4rem !important;
+  font-weight: 700 !important;
+  color: var(--text) !important;
+}
+[data-testid="stMetricLabel"] {
+  font-size: 0.7rem !important;
+  letter-spacing: 0.15em !important;
+  color: var(--text-dim) !important;
+  text-transform: uppercase !important;
+}
+
+/* --- Selectbox & inputs ------------------------------------------------- */
+[data-testid="stSelectbox"] > div > div {
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* --- Tabs --------------------------------------------------------------- */
+.stTabs [data-baseweb="tab-list"] {
+  background-color: transparent;
+  border-bottom: 1px solid var(--border);
+  gap: 0;
+}
+.stTabs [data-baseweb="tab"] {
+  background-color: transparent;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0;
+  border: 1px solid transparent;
+}
+.stTabs [aria-selected="true"] {
+  background-color: var(--text) !important;
+  color: var(--bg) !important;
+  font-weight: 700;
+}
+
+/* --- Dataframes --------------------------------------------------------- */
+[data-testid="stDataFrame"] {
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+/* --- Tyre legend (under Tyre Strategy chart) ---------------------------- */
+.tm-tyre-legend {
+  display: flex;
+  gap: 2.5rem;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+}
+.tm-tyre-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.tm-tyre-legend-item img {
+  height: 50px;
+  width: 50px;
+}
+
+/* --- Fastest pit driver row --------------------------------------------- */
+.tm-fastest-row {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+}
+.tm-fastest-time {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.tm-fastest-driver {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.tm-fastest-driver img {
+  height: 36px;
+}
+
+/* --- Section markers ---------------------------------------------------- */
+.tm-section-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+/* --- Hide Streamlit chrome --------------------------------------------- */
+#MainMenu {
+  visibility: hidden;
+}
+footer {
+  visibility: hidden;
+}
