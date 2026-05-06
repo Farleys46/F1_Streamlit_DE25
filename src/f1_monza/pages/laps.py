@@ -33,6 +33,7 @@ def build_gap_chart(
         positions_df: pd.DataFrame,
         year: int,
         session_type: str,
+        sector: str,
 ) -> go.Figure:
     
     pos_filtered = positions_df[
@@ -53,17 +54,26 @@ def build_gap_chart(
     session_keys = pos_filtered["session_key"].unique()
     laps_session = clean_laps[clean_laps["session_key"].isin(session_keys)]
 
+    sector_col_map = {
+        "Full lap": "lap_duration",
+        "Sector 1": "duration_sector_1",
+        "Sector 2": "duration_sector_2",
+        "Sector 3": "duration_sector_3",
+    }
+    col = sector_col_map[sector]
+
+    sector_laps = laps_session[laps_session[col].notna()]
     best_laps = (
-        laps_session
-        .groupby("driver_number")["lap_duration"]
+        sector_laps
+        .groupby("driver_number")[col]
         .min()
         .reset_index()
-        .rename(columns={"lap_duration": "best_lap"})
+        .rename(columns={col: "best_lap"})
     )
 
     merged = pos_filtered.merge(best_laps, on="driver_number", how="left")
     merged = merged.dropna(subset=["best_lap"])
-    merged = merged.sort_values("position")
+    merged = merged.sort_values("best_lap")
 
     if merged.empty:
         return None
@@ -85,7 +95,7 @@ def build_gap_chart(
         else:
             text_labels.append(format_gap(row["gap"]))
     
-    fig =go.Figure()
+    fig = go.Figure()
     fig.add_trace(go.Bar(
         x=merged["gap"],
         y=merged["y_label"],
@@ -130,16 +140,32 @@ def show():
 
     st.markdown("### Lap Time Gap")
 
-    year = 2025
-    session_type = "Qualifying"
+    col_year, col_session, col_sector = st.columns(3)
 
-    fig = build_gap_chart(laps_df, positions_df, year, session_type)
+    with col_year:
+        year = st.selectbox("Year", options=[2023, 2024, 2025], index=2)
+
+    with col_session:
+        session_type = st.radio(
+            "Session",
+            options=["Qualifying", "Race"],
+            horizontal=True,
+        )
+    
+    with col_sector:
+        sector = st.selectbox(
+            "Sector",
+            options=["Full lap", "Sector 1", "Sector 2", "Sector 3"],
+            index=0,
+        )
+
+    fig = build_gap_chart(laps_df, positions_df, year, session_type, sector)
 
     if fig is None:
-        st.warning(f"No data found for {year}- {session_type}.")
+        st.warning(f"No data found for {year} - {session_type} - {sector}.")
         return
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 if __name__ == "__main__":
     st.set_page_config(layout="wide", page_title="Laps – Monza")
