@@ -1,0 +1,159 @@
+/* F1 — Trackmetrics | Monza dashboard styling */
+
+/* --- Typography ---------------------------------------------------------- */
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Helvetica Neue", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+h1 {
+  font-size: 3rem;
+  text-transform: uppercase;
+}
+h2 {
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Hero (Home page) -------------------------------------------------- */
+.hero {
+  padding: 2rem 0 1.5rem 0;
+  border-bottom: 1px solid #2a2a2a;
+  margin-bottom: 2rem;
+}
+
+.hero-logo {
+  margin-bottom: 1.2rem;
+}
+
+.hero-logo svg {
+  height: 36px;
+  width: auto;
+}
+
+.hero-logo svg path,
+.hero-logo svg rect,
+.hero-logo svg polygon {
+  fill: #ffffff;
+}
+
+.hero-eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  color: #e10600;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.hero-title-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero-title-wrap svg {
+  width: clamp(280px, 50vw, 540px);
+  height: auto;
+}
+
+.hero-title-wrap svg,
+.hero-title-wrap svg path,
+.hero-title-wrap svg rect {
+  fill: #ffffff;
+}
+
+.hero-years {
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: #9a9a9a;
+  letter-spacing: 0.04em;
+  padding-bottom: 0.5rem;
+}
+
+.hero-tagline {
+  margin-top: 0.6rem;
+  font-size: 0.95rem;
+  color: #b8b8b8;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Section headers (red eyebrow text above each row) ---------------- */
+.section-header {
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  color: #e10600;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+}
+
+/* ---- Info cards (project info + winners on home page) ---------------- */
+.info-card {
+  background: #161616;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.info-card-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #888;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.info-card-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.info-card-sublabel {
+  font-size: 0.78rem;
+  color: #b8b8b8;
+  margin-top: 0.3rem;
+}
+
+/* ---- Track panel ------------------------------------------------------ */
+.track-panel {
+  background: #0f0f0f;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+}
+
+.track-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  color: #9a9a9a;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+.track-img {
+  width: 100%;
+  height: auto;
+  max-height: 240px;
+  object-fit: contain;
+  margin-bottom: 0.8rem;
+}
+
+.track-copy {
+  font-size: 0.85rem;
+  color: #b8b8b8;
+  line-height: 1.5;
+  margin: 0;
+}

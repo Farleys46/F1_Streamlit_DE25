@@ -1,1 +1,0 @@
-**Sector 3** is the iconic Parabolica — a long, sweeping right-hander leading back onto the main straight. It's all about minimum apex speed: lose 3 km/h here and you'll lose half a second over the following straight.

@@ -1,1 +1,0 @@
-**Sector 1** starts on the main straight — the longest flat-out stretch of the season — and ends after Variante della Roggia. Drivers reach over 350 km/h before braking hard for Variante del Rettifilo, the tight first chicane where overtakes happen on lap 1.
