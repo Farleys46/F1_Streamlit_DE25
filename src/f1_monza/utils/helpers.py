@@ -134,3 +134,20 @@ def get_race_finishing_order(year: int) -> list[str]:
     merged = race_pos.merge(race_drivers, on="driver_number", how="left")
     merged = merged.sort_values("position")
     return merged["name_acronym"].dropna().tolist()
+
+#----------------------------------------------------------------------------
+# Convenience: average air temp per season for the lollipop chart
+#----------------------------------------------------------------------------
+def get_seasons_air_temp():
+    """Return average race-day air temperature per track and season."""
+    weather = get_weather_df()
+
+    seasons_air_temp = (
+        weather[weather["session_name"] == "Race"]
+        .groupby(["year", "circuit_short_name"], as_index=False)[
+            "air_temperature"
+        ]
+        .mean()
+    )
+
+    return seasons_air_temp
