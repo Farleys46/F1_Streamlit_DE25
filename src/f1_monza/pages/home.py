@@ -142,18 +142,6 @@ def home():
     with tab_s3:
         _track_panel("Sector 3")
 
-    # ----- About the project -----
-    section_header("ABOUT THE PROJECT")
-    cols = st.columns(3)
-    with cols[0]:
-        _info_card(
-            "COURSE", "Data Engineering '25", sublabel="Group project, 4 students"
-        )
-    with cols[1]:
-        _info_card("DATA SOURCE", "OpenF1 API", sublabel="Real-time F1 telemetry")
-    with cols[2]:
-        _info_card("STACK", "Python · DuckDB", sublabel="Streamlit · Plotly · Power BI")
-
     # ----- Monza winners -----
     section_header("ITALIAN GP WINNERS")
     winners = _get_monza_winners()
@@ -177,6 +165,20 @@ def home():
 
     with st.expander("🔴 🟡 ⚪ What are the tyre compounds?"):
         st.markdown(sections["compounds"])
+
+    # ----- About the project -----
+    section_header("ABOUT THE PROJECT")
+    cols = st.columns(3)
+    with cols[0]:
+        _info_card(
+            "GROUP 2",
+            "INDIRA | JULIUS | FILIPPA | FILIP",
+            sublabel="Data Engineer '25'",
+        )
+    with cols[1]:
+        _info_card("DATA SOURCE", "OpenF1 API", sublabel="Real-time F1 telemetry")
+    with cols[2]:
+        _info_card("STACK", "Python · DuckDB", sublabel="Streamlit · Plotly · Power BI")
 
 
 if __name__ == "__main__":
