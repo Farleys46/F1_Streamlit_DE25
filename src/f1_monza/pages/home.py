@@ -4,12 +4,12 @@ from pathlib import Path
 
 import streamlit as st
 
-from f1_monza.utils.constants import IMAGE_PATH, MARKDOWN_PATH, STYLE_PATH
+from f1_monza.utils.constants import IMAGE_PATH, MARKDOWN_PATH
 from f1_monza.utils.helpers import (
     get_drivers_df,
     get_positions_df,
-    read_css,
     read_markdown_sections,
+    section_header,
 )
 
 
@@ -34,13 +34,6 @@ def _info_card(title: str, value: str, sublabel: str | None = None) -> None:
           {sub_html}
         </div>
         """,
-        unsafe_allow_html=True,
-    )
-
-
-def _section_header(text: str) -> None:
-    st.markdown(
-        f'<div class="section-header">{text}</div>',
         unsafe_allow_html=True,
     )
 
@@ -119,8 +112,6 @@ def _get_monza_winners() -> dict[int, tuple[str, str]]:
 
 
 def home():
-    read_css(STYLE_PATH / "dashboard.css")
-
     sections = read_markdown_sections(MARKDOWN_PATH / "home.md")
     monza_title = _read_svg(IMAGE_PATH / "monza_title.svg")
     trackmetrics_logo = _read_svg(IMAGE_PATH / "trackmetrics_logo.svg")
@@ -138,7 +129,7 @@ def home():
     st.markdown(sections["welcome"])
 
     # ----- Track explorer (tabs for each sector) -----
-    _section_header("EXPLORE THE TRACK")
+    section_header("EXPLORE THE TRACK")
     tab_all, tab_s1, tab_s2, tab_s3 = st.tabs(
         ["All sectors", "Sector 1", "Sector 2", "Sector 3"]
     )
@@ -152,7 +143,7 @@ def home():
         _track_panel("Sector 3")
 
     # ----- About the project -----
-    _section_header("ABOUT THE PROJECT")
+    section_header("ABOUT THE PROJECT")
     cols = st.columns(3)
     with cols[0]:
         _info_card(
@@ -164,7 +155,7 @@ def home():
         _info_card("STACK", "Python · DuckDB", sublabel="Streamlit · Plotly · Power BI")
 
     # ----- Monza winners -----
-    _section_header("ITALIAN GP WINNERS")
+    section_header("ITALIAN GP WINNERS")
     winners = _get_monza_winners()
     win_cols = st.columns(3)
     for col, year in zip(win_cols, [2023, 2024, 2025]):
@@ -176,7 +167,7 @@ def home():
                 _info_card(str(year), "—", sublabel="No data")
 
     # ----- New to F1? -----
-    _section_header("NEW TO F1?")
+    section_header("NEW TO F1?")
 
     with st.expander("🏁 What's a pit stop?"):
         st.markdown(sections["pit_stop"])

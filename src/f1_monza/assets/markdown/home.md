@@ -6,7 +6,9 @@ visualizations that make the sport easier to understand.​
 
 # pit_stop
 
-When a driver pulls into the pit lane to swap tyres. The crew has the four wheels off and on in **2 to 3 seconds**, but the full pit-lane time is closer to **22-25 seconds** because of the speed limit on the way in and out.
+When a driver pulls into the pit lane to swap tyres. The crew has the four wheels off and on in 2 to 3 seconds, but the full pit-lane time is closer to 22-25 seconds because of the speed limit on the way in and out.
+
+Regulations require every driver to make at least one pit stop during a dry race, and they must use at least two different tyre compounds — so a one-stop is the minimum strategy.
 
 # stint
 

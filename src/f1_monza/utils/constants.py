@@ -28,5 +28,12 @@ COLORS = {
     "accent_2": "#FFD800",  # medium-tyre yellow
 }
 
+# --- Season colors (used by weather lollipop chart) -------------------------
+SEASON_COLORS = {
+    2023: "#3FA9F5",
+    2024: "#3FE0A1",
+    2025: "#E10600",
+}
+
 # --- Years available ---------------------------------------------------------
 YEARS = [2023, 2024, 2025]

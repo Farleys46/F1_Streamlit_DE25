@@ -1,23 +1,18 @@
 import plotly.graph_objects as go
 import streamlit as st
 
-from f1_monza.utils.constants import COLORS, STYLE_PATH, YEARS
-from f1_monza.utils.helpers import get_laps_df, get_positions_df, get_weather_df, read_css
-
-read_css(STYLE_PATH / "dashboard.css")
+from f1_monza.utils.constants import COLORS
+from f1_monza.utils.helpers import (
+    get_driver_abbr_map,
+    get_laps_df,
+    get_positions_df,
+    get_weather_df,
+)
+from f1_monza.components.filters import year_selector, session_selector
 
 laps_df = get_laps_df()
 positions_df = get_positions_df()
 weather_df = get_weather_df()
-
-DRIVER_ABBR = {
-    1: "VER", 4: "NOR", 81: "PIA", 16: "LEC", 63: "RUS",
-    44: "HAM", 55: "SAI", 14: "ALO", 11: "PER", 23: "ALB",
-    22: "TSU", 3: "RIC", 2: "SAR", 20: "MAG", 31: "OCO",
-    10: "GAS", 18: "STR", 27: "HUL", 77: "BOT", 24: "ZHO",
-    40: "LAW", 43: "COL", 30: "HAD", 6: "HAD", 12: "ANT",
-    5: "BEA", 87: "BOR",
-}
 
 SECTOR_COL_MAP = {
     "Full lap": "lap_duration",
@@ -26,26 +21,30 @@ SECTOR_COL_MAP = {
     "Sector 3": "duration_sector_3",
 }
 
+
 def format_gap(seconds: float) -> str:
     return f"+{seconds:.3f}"
 
+
 def format_laptime(seconds: float) -> str:
-    mins = int(seconds //60)
+    mins = int(seconds // 60)
     secs = seconds % 60
     return f"{mins}:{secs:06.3f}"
 
+
 def clean_laps(df):
     return df[
-        (df["is_pit_out_lap"] == False) &
-        (df["lap_duration"].notna()) &
-        (df["lap_duration"] > 60)
+        (df["is_pit_out_lap"] == False)
+        & (df["lap_duration"].notna())
+        & (df["lap_duration"] > 60)
     ].copy()
+
 
 def get_session_keys(positions_df, year, session_type):
     return positions_df[
-        (positions_df["year"] == year) &
-        (positions_df["session_type"] == session_type)
+        (positions_df["year"] == year) & (positions_df["session_type"] == session_type)
     ]["session_key"].unique()
+
 
 # Kpi:s
 def show_kpis(year, session_type):
@@ -65,13 +64,13 @@ def show_kpis(year, session_type):
     col_speed.metric("Top Speed", f"{int(top_speed)} Km/h")
     col_avg_lap.metric("Avg Lap Time", format_laptime(float(avg_lap)))
 
+
 ### Barchart ###
 def build_gap_chart(year, session_type, sector):
     session_keys = get_session_keys(positions_df, year, session_type)
 
     pos_filtered = positions_df[
-        (positions_df["year"] == year) &
-        (positions_df["session_type"] == session_type)
+        (positions_df["year"] == year) & (positions_df["session_type"] == session_type)
     ].copy()
 
     if pos_filtered.empty:
@@ -82,9 +81,8 @@ def build_gap_chart(year, session_type, sector):
 
     col = SECTOR_COL_MAP[sector]
     sector_laps = laps_session[laps_session[col].notna()]
-    best_laps =(
-        sector_laps
-        .groupby("driver_number")[col]
+    best_laps = (
+        sector_laps.groupby("driver_number")[col]
         .min()
         .reset_index()
         .rename(columns={col: "best_lap"})
@@ -95,11 +93,15 @@ def build_gap_chart(year, session_type, sector):
 
     if merged.empty:
         return None
-    
+
     fastest = merged["best_lap"].min()
     merged["gap"] = merged["best_lap"] - fastest
-    merged["abbr"] = merged["driver_number"].map(DRIVER_ABBR).fillna(
-        merged["driver_number"].astype(str)
+
+    abbr_map = get_driver_abbr_map()
+    merged["abbr"] = (
+        merged["driver_number"]
+        .map(abbr_map)
+        .fillna(merged["driver_number"].astype(str))
     )
     merged["y_label"] = merged.apply(
         lambda r: f"P{str(r['position']).zfill(2)}. {r['abbr']}", axis=1
@@ -109,23 +111,25 @@ def build_gap_chart(year, session_type, sector):
         format_laptime(row["best_lap"]) if row["gap"] == 0 else format_gap(row["gap"])
         for _, row in merged.iterrows()
     ]
-    
+
     fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=merged["gap"],
-        y=merged["y_label"],
-        orientation="h",
-        text=text_labels,
-        textposition="outside",
-        textfont=dict(color=COLORS["text"], size=12, family="monospace"),
-        marker=dict(color=COLORS["text"]),
-        hovertemplate=(
-            "<b>%{y}</b><br>"
-            "Best lap-time: %{customdata}<br>"
-            "Gap: %{text}<extra></extra>"
-        ),
-        customdata=[format_laptime(v) for v in merged["best_lap"]],
-    ))
+    fig.add_trace(
+        go.Bar(
+            x=merged["gap"],
+            y=merged["y_label"],
+            orientation="h",
+            text=text_labels,
+            textposition="outside",
+            textfont=dict(color=COLORS["text"], size=12, family="monospace"),
+            marker=dict(color=COLORS["text"]),
+            hovertemplate=(
+                "<b>%{y}</b><br>"
+                "Best lap-time: %{customdata}<br>"
+                "Gap: %{text}<extra></extra>"
+            ),
+            customdata=[format_laptime(v) for v in merged["best_lap"]],
+        )
+    )
 
     fig.update_layout(
         plot_bgcolor=COLORS["bg"],
@@ -150,21 +154,17 @@ def build_gap_chart(year, session_type, sector):
 
     return fig
 
+
 def show():
-    
     # Slicers
     col_year, col_session, col_sector = st.columns(3)
 
     with col_year:
-        year = st.selectbox("Year", options=YEARS, index=2)
+        year = year_selector(label="Year", key="laps_year")
 
     with col_session:
-        session_type = st.radio(
-            "Session",
-            options=["Qualifying", "Race"],
-            horizontal=True,
-        )
-    
+        session_type = session_selector(key="laps_session")
+
     with col_sector:
         sector = st.selectbox(
             "Sector",
@@ -181,6 +181,7 @@ def show():
         return
 
     st.plotly_chart(fig, width="stretch")
+
 
 if __name__ == "__main__":
     st.set_page_config(layout="wide", page_title="Laps – Monza")

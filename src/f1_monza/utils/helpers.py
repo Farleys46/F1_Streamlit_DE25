@@ -1,10 +1,9 @@
 from pathlib import Path
-import base64
 
 import pandas as pd
 import streamlit as st
 
-from f1_monza.utils.constants import DATA_PATH, IMAGE_PATH
+from f1_monza.utils.constants import DATA_PATH
 
 
 # ---------------------------------------------------------------------------
@@ -20,17 +19,6 @@ def read_css(path: Path) -> None:
     """Inject a CSS file into the running Streamlit page."""
     css = read_textfile(path)
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
-
-
-def img_to_base64(path: Path) -> str:
-    """Encode an image to base64 so it can be embedded in HTML/CSS."""
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode("utf-8")
-
-
-def inline_svg(path: Path) -> str:
-    """Return the raw SVG markup so it can be embedded directly in HTML."""
-    return read_textfile(path)
 
 
 @st.cache_data
@@ -114,40 +102,43 @@ def get_sessions_df() -> pd.DataFrame:
 
 
 # ---------------------------------------------------------------------------
-# Convenience: drivers ordered by final race position for a given year
+# Aggregations used by views
 # ---------------------------------------------------------------------------
 @st.cache_data
-def get_race_finishing_order(year: int) -> list[str]:
-    """Return a list of driver acronyms in finishing order for the Monza race
-    of a given year. Used to sort the Gantt chart (P1 at top)."""
-    positions = get_positions_df()
-    drivers = get_drivers_df()
+def get_seasons_air_temp() -> pd.DataFrame:
+    """Average race-day air temperature per track and season.
 
-    race_pos = positions[
-        (positions["year"] == year) & (positions["session_type"] == "Race")
-    ][["driver_number", "position"]]
-
-    race_drivers = drivers[
-        (drivers["year"] == year) & (drivers["session_name"] == "Race")
-    ][["driver_number", "name_acronym"]]
-
-    merged = race_pos.merge(race_drivers, on="driver_number", how="left")
-    merged = merged.sort_values("position")
-    return merged["name_acronym"].dropna().tolist()
-
-#----------------------------------------------------------------------------
-# Convenience: average air temp per season for the lollipop chart
-#----------------------------------------------------------------------------
-def get_seasons_air_temp():
-    """Return average race-day air temperature per track and season."""
+    Used by the lollipop chart on the weather page.
+    """
     weather = get_weather_df()
 
-    seasons_air_temp = (
+    return (
         weather[weather["session_name"] == "Race"]
-        .groupby(["year", "circuit_short_name"], as_index=False)[
-            "air_temperature"
-        ]
+        .groupby(["year", "circuit_short_name"], as_index=False)["air_temperature"]
         .mean()
     )
 
-    return seasons_air_temp
+
+# ---------------------------------------------------------------------------
+# Shared UI helpers (used across multiple pages)
+# ---------------------------------------------------------------------------
+def section_header(text: str) -> None:
+    """Red eyebrow text used as a section divider on every page."""
+    st.markdown(
+        f'<div class="section-header">{text}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+@st.cache_data
+def get_driver_abbr_map() -> dict[int, str]:
+    """Map driver_number -> name_acronym, built from drivers data.
+
+    Used wherever we need to display a driver's 3-letter code.
+    """
+    drivers = get_drivers_df()
+    return (
+        drivers.drop_duplicates("driver_number")
+        .set_index("driver_number")["name_acronym"]
+        .to_dict()
+    )
