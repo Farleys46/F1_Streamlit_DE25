@@ -1,1 +1,0 @@
-**Sector 2** runs through the high-speed Curva Grande and into the second chicane, Variante della Roggia. It's the technical heart of Monza — long sweeping curves that punish any car set up too aggressively for straight-line speed.

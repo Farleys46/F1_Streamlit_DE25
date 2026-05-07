@@ -33,6 +33,32 @@ def inline_svg(path: Path) -> str:
     return read_textfile(path)
 
 
+@st.cache_data
+def read_markdown_sections(path: Path) -> dict[str, str]:
+    """Read a markdown file split into sections by '# section_name' headers.
+
+    Returns a dict of {section_name: section_content}.
+    """
+    text = read_textfile(path)
+    sections: dict[str, str] = {}
+    current_key: str | None = None
+    current_lines: list[str] = []
+
+    for line in text.splitlines():
+        if line.startswith("# "):
+            if current_key is not None:
+                sections[current_key] = "\n".join(current_lines).strip()
+            current_key = line[2:].strip()
+            current_lines = []
+        else:
+            current_lines.append(line)
+
+    if current_key is not None:
+        sections[current_key] = "\n".join(current_lines).strip()
+
+    return sections
+
+
 # ---------------------------------------------------------------------------
 # Data loaders — one per CSV, all cached
 # ---------------------------------------------------------------------------
