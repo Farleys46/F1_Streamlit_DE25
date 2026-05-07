@@ -4,7 +4,7 @@ import streamlit as st
 from f1_monza.utils.constants import COLORS, STYLE_PATH, YEARS
 from f1_monza.utils.helpers import get_laps_df, get_positions_df, get_weather_df, read_css
 
-read_css(STYLE_PATH / "dark.css")
+read_css(STYLE_PATH / "dashboard.css")
 
 laps_df = get_laps_df()
 positions_df = get_positions_df()
