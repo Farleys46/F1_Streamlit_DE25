@@ -6,7 +6,6 @@ from f1_monza.components.visualizations import plot_air_temp_lollipop
 
 
 def show():
-    st.title("Weather Dashboard")
 
     weather_df = get_weather_df()
     weather_df["year"] = weather_df["date"].dt.year

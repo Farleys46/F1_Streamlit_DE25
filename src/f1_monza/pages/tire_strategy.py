@@ -5,10 +5,6 @@ from f1_monza.components.filters import year_selector
 from f1_monza.components.visualizations import plot_tyre_strategy, plot_starting_tyres
 from f1_monza.components.kpis import display_fastest_pit_duration
 
-# Title and quick intro
-st.title("Tyre Strategy & Pit Stops")
-st.markdown("Analysis of tyre strategy and pit stops during the Monza Grand Prix.")
-
 # Load data
 pit_df = get_pits_df()
 stints_df = get_stints_df()
