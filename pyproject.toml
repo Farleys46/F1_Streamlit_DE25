@@ -1,7 +1,7 @@
 [project]
 name = "f1-monza"
 version = "0.1.0"
-description = "Add your description here"
+description = "F1 - Trackmetrics"
 readme = "README.md"
 authors = [
     { name = "Filip Farley", email = "filip@farley.se" }

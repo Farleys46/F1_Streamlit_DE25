@@ -102,7 +102,7 @@ def get_sessions_df() -> pd.DataFrame:
 
 
 # ---------------------------------------------------------------------------
-# Aggregations used by views
+# Aggregations used by pages
 # ---------------------------------------------------------------------------
 @st.cache_data
 def get_seasons_air_temp() -> pd.DataFrame:

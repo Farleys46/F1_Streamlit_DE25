@@ -1,9 +1,34 @@
+import re
+from pathlib import Path
+
 import streamlit as st
 
+from f1_monza.utils.constants import IMAGE_PATH
 from f1_monza.utils.helpers import get_pits_df, get_stints_df
 from f1_monza.components.filters import year_selector
 from f1_monza.components.visualizations import plot_tyre_strategy, plot_starting_tyres
 from f1_monza.components.kpis import display_fastest_pit_duration
+
+
+def _read_svg(path: Path) -> str:
+    svg = path.read_text(encoding="utf-8")
+    svg = re.sub(r"<defs>.*?</defs>", "", svg, flags=re.DOTALL)
+    return svg
+
+
+# --- Hero header ---
+monza_title = _read_svg(IMAGE_PATH / "monza_title.svg")
+trackmetrics_logo = _read_svg(IMAGE_PATH / "trackmetrics_logo.svg")
+
+st.markdown(
+    f"""
+    <div class="hero">
+      <div class="hero-logo">{trackmetrics_logo}</div>
+      <div class="hero-title-wrap">{monza_title}</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Load data
 pit_df = get_pits_df()

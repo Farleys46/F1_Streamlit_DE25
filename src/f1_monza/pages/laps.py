@@ -1,7 +1,10 @@
+import re
+from pathlib import Path
+
 import plotly.graph_objects as go
 import streamlit as st
 
-from f1_monza.utils.constants import COLORS
+from f1_monza.utils.constants import COLORS, IMAGE_PATH
 from f1_monza.utils.helpers import (
     get_driver_abbr_map,
     get_laps_df,
@@ -9,6 +12,13 @@ from f1_monza.utils.helpers import (
     get_weather_df,
 )
 from f1_monza.components.filters import year_selector, session_selector
+
+
+def _read_svg(path: Path) -> str:
+    svg = path.read_text(encoding="utf-8")
+    svg = re.sub(r"<defs>.*?</defs>", "", svg, flags=re.DOTALL)
+    return svg
+
 
 laps_df = get_laps_df()
 positions_df = get_positions_df()
@@ -156,6 +166,20 @@ def build_gap_chart(year, session_type, sector):
 
 
 def show():
+    # --- Hero header ---
+    monza_title = _read_svg(IMAGE_PATH / "monza_title.svg")
+    trackmetrics_logo = _read_svg(IMAGE_PATH / "trackmetrics_logo.svg")
+
+    st.markdown(
+        f"""
+        <div class="hero">
+          <div class="hero-logo">{trackmetrics_logo}</div>
+          <div class="hero-title-wrap">{monza_title}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     # Slicers
     col_year, col_session, col_sector = st.columns(3)
 
